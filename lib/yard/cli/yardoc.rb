@@ -580,6 +580,8 @@ module YARD
         opts.on('--fail-on-warning', 'Exit with error status code if a warning occurs') do
           self.fail_on_warning = true
         end
+
+        opts.on('--list-undoc', 'List all undocumented objects')
       end
 
       # Adds output options
