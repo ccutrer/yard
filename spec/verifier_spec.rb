@@ -74,7 +74,7 @@ RSpec.describe YARD::Verifier do
 
     it "always ignores proxy objects and return true" do
       v = Verifier.new('tag(:x)')
-      expect { expect(v.call(P('foo'))).to be true }.not_to raise_error
+      expect(v.call(P('foo'))).to be true
     end
   end
 
