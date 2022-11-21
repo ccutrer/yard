@@ -68,6 +68,11 @@ module YARD
     end
     attr_accessor :warned
 
+    def error(*args)
+      self.warned = true
+      super
+    end
+
     # Captures the duration of a block of code for benchmark analysis. Also
     # calls {#progress} on the message to display it to the user.
     #
