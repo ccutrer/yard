@@ -11,6 +11,11 @@ module YARD
         options.format = :text # default for this command
         @layout = nil
         @objects = []
+
+        serializer = @options.serializer
+        def serializer.serialize(_object, _data)
+          # don't actually serialize anything
+        end
       end
 
       # Runs the commandline utility, parsing arguments and displaying an object
