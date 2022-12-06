@@ -284,14 +284,7 @@ module YARD
         log.show_progress = false
       end
 
-      # Parses commandline arguments
-      # @param [Array<String>] args the list of arguments
-      # @return [Boolean] whether or not arguments are valid
-      # @since 0.5.6
-      def parse_arguments(*args)
-        super(*args)
-
-        # Last minute modifications
+      def find_readme
         self.files = Parser::SourceParser::DEFAULT_PATH_GLOB if files.empty?
         files.delete_if {|x| x =~ /\A\s*\Z/ } # remove empty ones
         readme = Dir.glob('README{,*[^~]}').
@@ -300,6 +293,17 @@ module YARD
         readme ||= Dir.glob(files.first).first if options.onefile && !files.empty?
         options.readme ||= CodeObjects::ExtraFileObject.new(readme) if readme && extra_file_valid?(readme)
         options.files.unshift(options.readme).uniq! if options.readme
+      end
+
+      # Parses commandline arguments
+      # @param [Array<String>] args the list of arguments
+      # @return [Boolean] whether or not arguments are valid
+      # @since 0.5.6
+      def parse_arguments(*args)
+        super(*args)
+
+        # Last minute modifications
+        find_readme
 
         Tags::Library.visible_tags -= hidden_tags
         add_visibility_verifier

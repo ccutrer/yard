@@ -44,18 +44,37 @@ module YARD
       # Parses commandline options.
       # @param [Array<String>] args each tokenized argument
       def parse_arguments(*args)
-        opts = OptionParser.new
-        opts.banner = "Usage: yard display [options] OBJECT [OTHER OBJECTS]"
-        general_options(opts)
-        output_options(opts)
-        parse_options(opts, args)
+        parse_yardopts_options(*args)
+        parse_rdoc_document_file
+        parse_yardopts
+        optparse(*args)
+        find_readme
+
+        add_visibility_verifier
+        add_api_verifier
 
         Registry.load
-        @objects = args.map {|o| Registry.at(o) }
+        @objects = files.map do |o|
+          if o.start_with?("file:")
+            options.files.find { |f| f.filename == o[5..-1] }
+          else
+            Registry.at(o)
+          end
+        end
 
         # validation
         return false if @objects.any?(&:nil?)
         verify_markup_options
+      end
+
+      def optparse(*args)
+        opts = OptionParser.new
+        opts.banner = "Usage: yard display [options] OBJECT [OTHER OBJECTS]"
+        general_options(opts)
+        output_options(opts)
+        common_options(opts)
+        parse_options(opts, args)
+        parse_files(*args) unless args.empty?
       end
 
       def output_options(opts)

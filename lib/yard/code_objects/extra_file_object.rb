@@ -69,6 +69,18 @@ module YARD::CodeObjects
     alias equal? ==
     def hash; filename.hash end
 
+    def format(options = {})
+      options = options.merge(object: YARD::Registry.root, file: self)
+      options[:index] = true if self == options.readme
+      YARD::Templates::Engine.with_serializer(filename, options.serializer) do
+        path = ['layout']
+        path.unshift(options.template) if options.template
+        path.push(options.format) if options.format
+
+        YARD::Templates::Engine.template(*path).run(options)
+      end
+    end
+
     private
 
     def ensure_parsed
