@@ -229,7 +229,7 @@ module YARD
           # Generate doc for first time
           # This is not necessary but makes for a better first-run experience
           libver = libraries.empty? ? nil : libraries.values.first.first
-          generate_doc_for_first_time(libver) if libver && !libver.ready?
+          generate_doc_for_first_time(libver) if libver
         else
           add_libraries(args)
           options[:single_library] = false if libraries.size > 1
@@ -237,12 +237,14 @@ module YARD
       end
 
       def generate_doc_for_first_time(libver)
-        log.enter_level(Logger::INFO) do
-          yardoc_file = libver.yardoc_file.sub(%r{^#{Regexp.quote Dir.pwd}[\\/]+}, '')
-          log.info "No yardoc db found in #{yardoc_file}, parsing source before starting server..."
+        if !libver.ready?
+          log.enter_level(Logger::INFO) do
+            yardoc_file = libver.yardoc_file.sub(%r{^#{Regexp.quote Dir.pwd}[\\/]+}, '')
+            log.info "No yardoc db found in #{yardoc_file}, parsing source before starting server..."
+          end
         end
         Dir.chdir(libver.source_path) do
-          Yardoc.run('-n')
+          Yardoc.run('-c', '-n')
         end
       end
 
