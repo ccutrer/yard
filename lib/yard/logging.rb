@@ -35,7 +35,7 @@ module YARD
 
     # The logger instance
     # @return [Logger] the logger instance
-    def self.instance(pipe = STDOUT)
+    def self.instance(pipe = $stdout)
       @logger ||= new(pipe)
     end
 
@@ -63,14 +63,18 @@ module YARD
 
     # Remembers when a warning occurs and writes a warning message.
     def warn(*args)
-      self.warned = true
-      super
+      with_stderr do
+        self.warned = true
+        super
+      end
     end
     attr_accessor :warned
 
     def error(*args)
-      self.warned = true
-      super
+      with_stderr do
+        self.warned = true
+        super
+      end
     end
 
     # Captures the duration of a block of code for benchmark analysis. Also
@@ -190,6 +194,17 @@ module YARD
     end
 
     private
+
+    def with_stderr
+      return yield unless io == $stdout
+
+      old_io = io
+      self.io = $stderr
+
+      yield
+    ensure
+      self.io = old_io if old_io
+    end
 
     # Override this internal Logger method to clear line
     def add(*args)
