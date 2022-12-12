@@ -125,7 +125,8 @@ module YARD::CodeObjects
     # @return [Boolean] whether the object is an alias
     def is_alias?
       return false unless namespace.is_a?(NamespaceObject)
-      namespace.aliases.key? self
+
+      (target = namespace.aliases[self]) && namespace.child(name: target)
     end
 
     # Tests boolean {#explicit} value.
